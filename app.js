@@ -81,7 +81,7 @@ function updatedOwnIp() {
     ipify((err, ip) => {
         if (!err && ip) {
 	    app.set('ip', ip);
-            needle.post('http://rolishome.herokuapp.com/register', {
+            needle.post(env.registryAddress, {
             	address: 'http://' + ip + ':3000'
             }, {
             	headers: {

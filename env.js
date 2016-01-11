@@ -4,5 +4,6 @@ module.exports = {
 		own: {
 			readOnly: process.env.OWN_READ_ONLY_API_KEY
 		}
-	}
+	},
+	registryAddress: process.env.REGISTRY_APP_ADDRESS
 };
