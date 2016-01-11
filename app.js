@@ -26,21 +26,15 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
-/*app.use(require('node-sass-middleware')({
-    src: path.join(__dirname, 'public'),
-    dest: path.join(__dirname, 'public'),
-    indentedSyntax: true,
-    sourceMap: true
-}));*/
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
     if (req.headers.api_key !== env.apiKeys.own.readOnly) {
-	res.send(403);
+	   res.send(403);
     } else {
         next();
     }
-});
+});*/
 
 app.use('/', routes);
 app.use('/users', users);
