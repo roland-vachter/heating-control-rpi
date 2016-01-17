@@ -14,7 +14,8 @@ db.getConnection(env.mongo.uri, (err, connection) => {
 		_id: -1
 	}).limit(1).toArray((err, dbEntries) => {
 		if (err) {
-			throw err;
+			init(null, null);
+			return;
 		}
 
 		if (dbEntries && dbEntries.length) {
@@ -38,8 +39,6 @@ db.getConnection(env.mongo.uri, (err, connection) => {
 
 
 function init (lastValues, lastDate) {
-	console.log(lastDate);
-
 	if (lastDate === null) {
 		startRefresh();
 	} else {
@@ -48,8 +47,6 @@ function init (lastValues, lastDate) {
 }
 
 function startRefresh () {
-	console.log('startRefresh');
-
 	refresh();
 	setInterval(refresh, saveInterval * 60 * 1000);
 }
@@ -77,8 +74,6 @@ function refresh () {
 }
 
 function save () {
-	console.log('save');
-
 	db.getConnection(env.mongo.uri, (err, connection) => {
 		connection.collection('ambientalConditions').insert({
 			_id: new Date(),
@@ -97,4 +92,49 @@ function save () {
 
 exports.getCurrentConditions = function () {
 	return currentValues;
+};
+
+exports.getPastConditions = function (startDate, endDate) {
+	return new Promise((resolve, reject) => {
+		if (!startDate) {
+			startDate = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+		}
+
+		if (!endDate) {
+			endDate = new Date();
+		}
+
+
+		db.getConnection(env.mongo.uri, (err, connection) => {
+			connection.collection('ambientalConditions').find({
+				_id: {
+					$gt: startDate,
+					$lt: endDate
+				}
+			}).sort({
+				_id: 1
+			}).toArray((err, dbEntries) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+
+				let reformatted = dbEntries.map((obj) => {
+					return {
+						date: obj._id,
+						inside: {
+							temperature: obj.i.t,
+							humidity: obj.i.h
+						},
+						outside: {
+							temperature: obj.o.t,
+							humidity: obj.o.h
+						}
+					};
+				});
+
+				resolve(reformatted);
+			});
+		});
+	});
 };

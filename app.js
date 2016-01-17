@@ -8,6 +8,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var updateOwnIp = require('./app/updateOwnIp');
+var env = require('./env');
 
 var app = express();
 
@@ -28,10 +29,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
-	if (req.headers.api_key !== updateOwnIp.getReadOnlyApiKey()) {
-		res.send(403);
-	} else {
+	if (req.headers.api_key === updateOwnIp.getReadOnlyApiKey() || env.inDevMode) {
 		next();
+	} else {
+		res.send(403);
 	}
 });
 
