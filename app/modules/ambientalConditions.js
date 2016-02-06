@@ -40,22 +40,17 @@ db.getConnection(env.mongo.uri, (err, connection) => {
 
 
 function init (lastValues, lastDate) {
-	if (lastDate === null) {
-		startRefresh();
-	} else {
-		setTimeout(startRefresh, lastDate.getTime() + refreshInterval * 60 * 1000 - new Date().getTime());
-	}
-
-
-	if (lastDate === null) {
-		startSave();
-	} else {
-		setTimeout(startRefresh, lastDate.getTime() + saveInterval * 60 * 1000 - new Date().getTime());
-	}
+	startRefresh(() => {
+		if (lastDate === null) {
+			startSave();
+		} else {
+			setTimeout(startSave, lastDate.getTime() + saveInterval * 60 * 1000 - new Date().getTime());
+		}
+	});
 }
 
-function startRefresh () {
-	refresh();
+function startRefresh (callback) {
+	refresh(callback);
 	setInterval(refresh, refreshInterval * 60 * 1000);
 }
 
@@ -64,7 +59,7 @@ function startSave () {
 	setInterval(save, saveInterval * 60 * 1000);
 }
 
-function refresh () {
+function refresh (callback) {
 	outsideConditions.get().then((outData) => {
 		insideConditions.get().then((inData) => {
 			if (outData && inData) {
@@ -81,26 +76,32 @@ function refresh () {
 
 				socket().emit('ambiental-conditions', currentValues);
 			}
+
+			callback();
 		});
 	}).catch((e) => {
 		console.log('error', e);
+
+		callback();
 	});
 }
 
 function save () {
-	db.getConnection(env.mongo.uri, (err, connection) => {
-		connection.collection('ambientalConditions').insert({
-			_id: new Date(),
-			i: {
-				t: currentValues.inside.temperature,
-				h: currentValues.inside.humidity
-			},
-			o: {
-				t: currentValues.outside.temperature,
-				h: currentValues.outside.humidity
-			}
-		}, currentValues);
-	});
+	if (currentValues) {
+		db.getConnection(env.mongo.uri, (err, connection) => {
+			connection.collection('ambientalConditions').insert({
+				_id: new Date(),
+				i: {
+					t: currentValues.inside.temperature,
+					h: currentValues.inside.humidity
+				},
+				o: {
+					t: currentValues.outside.temperature,
+					h: currentValues.outside.humidity
+				}
+			}, currentValues);
+		});
+	}
 }
 
 
