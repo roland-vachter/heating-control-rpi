@@ -28,7 +28,7 @@ exports.init = function () {
 function updateOwnIp() {
 	ipify((err, ip) => {
 		if (!err && ip) {
-			console.log('register');
+			console.log('register to ' + env.registryAddress);
 			ownIp = ip;
 
 			ownAddress = env.inDevMode ? 'http://localhost:3000' : 'http://' + ip + ':3000';

@@ -6,7 +6,8 @@ const outsideConditions = require('./outsideConditions');
 const insideConditions = require('./insideConditions');
 const socket = require('../socket');
 
-let saveInterval = env.ambientalSaveInterval || 10; // minutes
+let refreshInterval = 10; // minutes
+let saveInterval = 30;
 let currentValues;
 
 db.getConnection(env.mongo.uri, (err, connection) => {
@@ -42,34 +43,47 @@ function init (lastValues, lastDate) {
 	if (lastDate === null) {
 		startRefresh();
 	} else {
+		setTimeout(startRefresh, lastDate.getTime() + refreshInterval * 60 * 1000 - new Date().getTime());
+	}
+
+
+	if (lastDate === null) {
+		startSave();
+	} else {
 		setTimeout(startRefresh, lastDate.getTime() + saveInterval * 60 * 1000 - new Date().getTime());
 	}
 }
 
 function startRefresh () {
 	refresh();
-	setInterval(refresh, saveInterval * 60 * 1000);
+	setInterval(refresh, refreshInterval * 60 * 1000);
+}
+
+function startSave () {
+	save();
+	setInterval(save, saveInterval * 60 * 1000);
 }
 
 function refresh () {
 	outsideConditions.get().then((outData) => {
 		insideConditions.get().then((inData) => {
-			currentValues = {
-				inside: {
-					temperature: inData.temperature,
-					humidity: inData.humidity
-				},
-				outside: {
-					temperature: outData.temperature,
-					humidity: outData.humidity
-				}
-			};
+			if (outData && inData) {
+				currentValues = {
+					inside: {
+						temperature: inData.temperature,
+						humidity: inData.humidity
+					},
+					outside: {
+						temperature: outData.temperature,
+						humidity: outData.humidity
+					}
+				};
 
-			socket().emit('ambiental-conditions', currentValues);
-
-
-			save();
+				socket().emit('ambiental-conditions', currentValues);
+			}
 		});
+	}).catch((e) => {
+		console.log('error', e);
 	});
 }
 
