@@ -1,6 +1,7 @@
 "use strict";
 
 module.exports = {
+	port: process.env.PORT || '4000',
 	apiKeys: {
 		registry: process.env.REGISTRY_API_KEY
 	},

@@ -31,7 +31,7 @@ function updateOwnIp() {
 			console.log('register to ' + env.registryAddress);
 			ownIp = ip;
 
-			ownAddress = env.inDevMode ? 'http://localhost:3000' : 'http://' + ip + ':3000';
+			ownAddress = (env.inDevMode ? 'http://localhost' : 'http://' + ip) + ':' + env.port;
 
 			needle.post(env.registryAddress, {
 				address: ownAddress,
