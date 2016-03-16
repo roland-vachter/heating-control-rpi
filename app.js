@@ -70,4 +70,6 @@ app.use(function(err, req, res, next) {
 });
 
 
+require('./app/modules/lcd');
+
 module.exports = app;
