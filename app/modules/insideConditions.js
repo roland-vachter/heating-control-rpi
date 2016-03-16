@@ -20,7 +20,7 @@ let dhtInstance = new dht.DHT22(env.dhtSensor.pin);
 
 function update () {
 	let data = dhtInstance.read();
-	lastValues.temperature = (data.temperature * 10) / 10;
+	lastValues.temperature = Math.round(data.temperature * 10) / 10;
 	lastValues.humidity = parseInt(data.humidity, 10);
 
 	evts.emit('change', lastValues);
