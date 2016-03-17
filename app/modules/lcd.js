@@ -17,6 +17,8 @@ if (env.lcd.enable) {
 		e: env.lcd.e,
 		data: env.lcd.data
 	});
+	lcd.noCursor();
+	lcd.noAutoscroll();
 
 	let printLcd = function (data) {
 		lcd.clear(function () {
