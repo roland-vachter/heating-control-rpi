@@ -19,17 +19,19 @@ if (env.lcd.enable) {
 	});
 
 	let printLcd = function (data) {
-		lcd.setCursor(0, 0);
-		lcd.print('I: '+
-					("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-					("   " + data.inside.humidity).slice(-3) + '%',
-			() => {
-				lcd.setCursor(0, 1);
-				lcd.print('O: '+
-					("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-					("   " + data.outside.humidity).slice(-3) + '%');
-			}
-		);
+		lcd.clear(function () {
+			lcd.setCursor(0, 0);
+			lcd.print('I: '+
+						("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+						("   " + data.inside.humidity).slice(-3) + '%',
+				() => {
+					lcd.setCursor(0, 1);
+					lcd.print('O: '+
+						("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+						("   " + data.outside.humidity).slice(-3) + '%');
+				}
+			);
+		});
 	};
 
 	const ambientalConditions = require('./ambientalConditions');
