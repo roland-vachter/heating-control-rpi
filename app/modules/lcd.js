@@ -18,25 +18,29 @@ if (env.lcd.enable) {
 		data: env.lcd.data
 	});
 
-	setTimeout(function () {
+	lcd.on('ready', () => {
 		lcd.noCursor();
 		lcd.noAutoscroll();
 		lcd.noBlink();
 
-		let printLcd = function (data) {
-			lcd.clear(function () {
-				lcd.home(function () {
+		let printLcd = (data) => {
+			lcd.clear(() => {
+				lcd.home(() => {
 					lcd.setCursor(0, 0);
-					lcd.print('I: '+
-								("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-								("   " + data.inside.humidity).slice(-3) + '%',
-						() => {
-							lcd.setCursor(0, 1);
-							lcd.print('O: '+
-								("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-								("   " + data.outside.humidity).slice(-3) + '%');
-						}
-					);
+					setTimeout(() => {
+						lcd.print('I: '+
+									("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+									("   " + data.inside.humidity).slice(-3) + '%',
+							() => {
+								lcd.setCursor(0, 1);
+								setTimeout(() => {
+									lcd.print('O: '+
+										("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+										("   " + data.outside.humidity).slice(-3) + '%');
+								}, 50);
+							}
+						);
+					}, 50);
 				});
 			});
 		};
@@ -48,5 +52,5 @@ if (env.lcd.enable) {
 		ambientalConditions.evts.on('change', function (data) {
 			printLcd(data);
 		});
-	}, 1000);
+	});
 }
