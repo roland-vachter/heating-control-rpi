@@ -26,6 +26,7 @@ if (env.lcd.enable) {
 		let printLcd = function (data) {
 			lcd.clear(function () {
 				lcd.home(function () {
+					lcd.setCursor(0, 0);
 					lcd.print('I: '+
 								("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
 								("   " + data.inside.humidity).slice(-3) + '%',
