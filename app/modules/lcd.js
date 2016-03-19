@@ -23,26 +23,30 @@ if (env.lcd.enable) {
 		lcd.noAutoscroll();
 		lcd.noBlink();
 
+		let printInProgress = false;
 		let printLcd = (data) => {
-			lcd.clear(() => {
-				lcd.home(() => {
-					lcd.setCursor(0, 0);
-					setTimeout(() => {
+			if (!printInProgress) {
+				printInProgress = true;
+
+				lcd.clear(() => {
+					lcd.home(() => {
+						lcd.setCursor(0, 0);
 						lcd.print('I: '+
-									("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-									("   " + data.inside.humidity).slice(-3) + '%',
+							("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+							("   " + data.inside.humidity).slice(-3) + '%',
 							() => {
 								lcd.setCursor(0, 1);
-								setTimeout(() => {
-									lcd.print('O: '+
-										("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-										("   " + data.outside.humidity).slice(-3) + '%');
-								}, 50);
+								lcd.print('O: '+
+									("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+									("   " + data.outside.humidity).slice(-3) + '%',
+									() => {
+										printInProgress = false;
+									});
 							}
 						);
-					}, 50);
+					});
 				});
-			});
+			}
 		};
 
 		const ambientalConditions = require('./ambientalConditions');

@@ -21,10 +21,12 @@ function update () {
 			let temperature = parseInt(response.body.query.results.channel.item.condition.temp, 10);
 			let humidity = parseInt(response.body.query.results.channel.atmosphere.humidity, 10);
 
-			lastValues.temperature = temperature;
-			lastValues.humidity = humidity;
+			if (lastValues.temperature !== temperature || lastValues.humidity !== humidity) {
+				lastValues.temperature = temperature;
+				lastValues.humidity = humidity;
 
-			evts.emit('change', lastValues);
+				evts.emit('change', lastValues);
+			}
 		} catch (e) {
 			console.log(e);
 		}
@@ -32,7 +34,7 @@ function update () {
 }
 setInterval(() => {
 	update();
-}, 10 * 60 * 1000);
+}, 60 * 1000);
 update();
 
 exports.get = function () {
