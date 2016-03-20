@@ -31,19 +31,23 @@ if (env.lcd.enable) {
 				lcd.clear(() => {
 					lcd.home(() => {
 						lcd.setCursor(0, 0);
-						lcd.print('I: '+
-							("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-							("   " + data.inside.humidity).slice(-3) + '%',
-							() => {
-								lcd.setCursor(0, 1);
-								lcd.print('O: '+
-									("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
-									("   " + data.outside.humidity).slice(-3) + '%',
-									() => {
-										printInProgress = false;
-									});
-							}
-						);
+						setTimeout(() => {
+							lcd.print('I: '+
+										("     " + data.inside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+										("   " + data.inside.humidity).slice(-3) + '%',
+								() => {
+									lcd.setCursor(0, 1);
+									setTimeout(() => {
+										lcd.print('O: '+
+											("     " + data.outside.temperature.toFixed(1)).slice(-5) + 'C  ' +
+											("   " + data.outside.humidity).slice(-3) + '%',
+											() => {
+												printInProgress = false;
+											});
+									}, 50);
+								}
+							);
+						}, 50);
 					});
 				});
 			}
